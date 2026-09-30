@@ -1,18 +1,17 @@
 # AdonisJS 7 + Inertia + React
 
-Base issue du [starter officiel React](https://github.com/adonisjs/starter-kits/tree/inertia-react), avec TypeScript, Vite, Lucid/SQLite et authentification par session.
+Base issue du [starter officiel React](https://github.com/adonisjs/starter-kits/tree/inertia-react), avec TypeScript, Vite, Lucid/PostgreSQL et authentification par session.
 
 ## Prérequis
 
-- Node.js 24 ou supérieur
-- npm 11 ou supérieur
+- Docker avec le plugin Compose
 
 ## Développement
 
-Le projet est déjà installé, le fichier `.env` est configuré et les migrations sont appliquées localement.
+Le projet est entièrement conteneurisé. Le service `app` construit l'application AdonisJS et le service `postgres` fournit PostgreSQL 17 avec un volume persistant.
 
 ```sh
-npm run dev
+docker compose up --build -d
 ```
 
 Ouvrir <http://localhost:3333>.
@@ -20,18 +19,43 @@ Ouvrir <http://localhost:3333>.
 Pour installer le projet depuis un nouveau clone :
 
 ```sh
-npm ci
+cp .env.example .env
+docker compose build app
 ```
 
-Copier `.env.example` vers `.env`, puis exécuter :
+Si `APP_KEY` est vide, générer une clé depuis l'image puis la reporter dans `.env` :
 
 ```sh
-node ace generate:key
+docker compose run --rm --no-deps -e APP_KEY=temporary app node ace generate:key --show
+```
+
+Lancer ensuite l'environnement :
+
+```sh
+docker compose up -d
+docker compose ps
+```
+
+Les migrations Lucid sont appliquées automatiquement avant chaque démarrage de l'application. Le volume Docker `postgres_data` conserve les données PostgreSQL entre les redémarrages. Le fichier `.env` est exclu de Git.
+
+Pour consulter les journaux ou arrêter l'environnement :
+
+```sh
+docker compose logs -f app
+docker compose down
+```
+
+`docker compose down -v` supprime également les données PostgreSQL et ne doit être utilisé que pour réinitialiser volontairement la base.
+
+### Développement sans Docker
+
+Node.js 24, npm 11 et PostgreSQL sont nécessaires :
+
+```sh
+npm ci
 node ace migration:run
 npm run dev
 ```
-
-La base SQLite se trouve dans `tmp/db.sqlite3`. Le fichier `.env` et la base locale sont exclus de Git.
 
 ## Pages et organisation
 
@@ -58,21 +82,12 @@ npm run build
 
 Japa est configuré (`npm test`), mais le starter ne contient pas encore de tests.
 
-## Production
+## Image de production
 
 ```sh
-npm run build
-cd build
-npm ci --omit=dev
+docker build --target runner -t gpt-cloud-test .
 ```
 
-Configurer les variables d'environnement de production (dont `NODE_ENV=production`, `APP_KEY`, `APP_URL`, `HOST` et `PORT`), puis lancer :
-
-```sh
-node ace migration:run --force
-npm start
-```
-
-Conserver `APP_KEY` et la base SQLite entre les déploiements.
+L'image exécute les migrations avant de lancer le serveur. En production, fournir `APP_KEY`, `APP_URL`, `LOG_LEVEL` et les variables `DB_*` via le gestionnaire de secrets de la plateforme. Conserver `APP_KEY` entre les déploiements et sauvegarder régulièrement la base PostgreSQL.
 
 Documentation : [installation AdonisJS](https://docs.adonisjs.com/installation) et [Inertia](https://docs.adonisjs.com/guides/frontend/inertia).
