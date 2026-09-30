@@ -1,42 +1,4 @@
 services:
-  app:
-    build:
-      context: .
-      target: runner
-    image: gpt-cloud-test:local
-    restart: unless-stopped
-    init: true
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      NODE_ENV: production
-      HOST: 0.0.0.0
-      PORT: 3333
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      APP_KEY: ${APP_KEY:-}
-      APP_URL: ${APP_URL:-http://localhost:3333}
-      SESSION_DRIVER: ${SESSION_DRIVER:-cookie}
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-gpt_cloud_test}
-      DB_PASSWORD: ${DB_PASSWORD:-gpt_cloud_test}
-      DB_DATABASE: ${DB_DATABASE:-gpt_cloud_test}
-    ports:
-      - '${PORT:-3333}:3333'
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "fetch('http://127.0.0.1:3333/').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   postgres:
     image: postgres:17-alpine
     restart: unless-stopped

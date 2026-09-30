@@ -4,62 +4,52 @@ Base issue du [starter officiel React](https://github.com/adonisjs/starter-kits/
 
 ## Prérequis
 
+- Node.js 24 et npm 11
 - Docker avec le plugin Compose
 
 ## Développement
 
-Le projet est entièrement conteneurisé. Le service `app` construit l'application AdonisJS et le service `postgres` fournit PostgreSQL 17 avec un volume persistant.
+Docker Compose lance uniquement PostgreSQL 17. L'application AdonisJS s'exécute directement dans l'environnement de développement Node.js, avec rechargement à chaud.
+
+Pour installer et configurer le projet depuis un nouveau clone :
 
 ```sh
-docker compose up --build -d
+cp .env.example .env
+npm ci
+```
+
+Générer une clé d'application et la reporter dans `APP_KEY` du fichier `.env` :
+
+```sh
+node ace generate:key --show
+```
+
+Lancer PostgreSQL, appliquer les migrations puis démarrer l'application en mode développement :
+
+```sh
+docker compose up -d --wait
+node ace migration:run
+npm start
 ```
 
 Ouvrir <http://localhost:3333>.
 
-Pour installer le projet depuis un nouveau clone :
+`npm start` lance le serveur AdonisJS en mode développement avec HMR. La commande `npm run dev` reste disponible comme alias.
+
+Pour vérifier l'état de PostgreSQL, consulter ses journaux ou l'arrêter :
 
 ```sh
-cp .env.example .env
-docker compose build app
-```
-
-Si `APP_KEY` est vide, générer une clé depuis l'image puis la reporter dans `.env` :
-
-```sh
-docker compose run --rm --no-deps -e APP_KEY=temporary app node ace generate:key --show
-```
-
-Lancer ensuite l'environnement :
-
-```sh
-docker compose up -d
 docker compose ps
-```
-
-Les migrations Lucid sont appliquées automatiquement avant chaque démarrage de l'application. Le volume Docker `postgres_data` conserve les données PostgreSQL entre les redémarrages. Le fichier `.env` est exclu de Git.
-
-Pour consulter les journaux ou arrêter l'environnement :
-
-```sh
-docker compose logs -f app
+docker compose logs -f postgres
 docker compose down
 ```
 
-`docker compose down -v` supprime également les données PostgreSQL et ne doit être utilisé que pour réinitialiser volontairement la base.
-
-### Développement sans Docker
-
-Node.js 24, npm 11 et PostgreSQL sont nécessaires :
-
-```sh
-npm ci
-node ace migration:run
-npm run dev
-```
+Le volume Docker `postgres_data` conserve les données entre les redémarrages. `docker compose down -v` supprime également ces données et ne doit être utilisé que pour réinitialiser volontairement la base. Le fichier `.env` est exclu de Git.
 
 ## Pages et organisation
 
 - `/` : accueil Inertia
+- `/weather` : météo actuelle de Paris via Open-Meteo
 - `/signup` et `/login` : inscription et connexion
 - `/dashboard` : page réservée aux utilisateurs connectés
 - `start/routes.ts` : routes du backend
@@ -82,12 +72,13 @@ npm run build
 
 Japa est configuré (`npm test`), mais le starter ne contient pas encore de tests.
 
-## Image de production
+## Exécution en production
 
 ```sh
-docker build --target runner -t gpt-cloud-test .
+npm run build
+npm run start:prod
 ```
 
-L'image exécute les migrations avant de lancer le serveur. En production, fournir `APP_KEY`, `APP_URL`, `LOG_LEVEL` et les variables `DB_*` via le gestionnaire de secrets de la plateforme. Conserver `APP_KEY` entre les déploiements et sauvegarder régulièrement la base PostgreSQL.
+Appliquer les migrations avec `node ace migration:run --force` au moment du déploiement. En production, fournir `APP_KEY`, `APP_URL`, `LOG_LEVEL` et les variables `DB_*` via le gestionnaire de secrets de la plateforme. Conserver `APP_KEY` entre les déploiements et sauvegarder régulièrement la base PostgreSQL.
 
 Documentation : [installation AdonisJS](https://docs.adonisjs.com/installation) et [Inertia](https://docs.adonisjs.com/guides/frontend/inertia).

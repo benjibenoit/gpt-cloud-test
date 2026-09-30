@@ -12,6 +12,12 @@ const routes = {
     tokens: [{"old":"/","type":0,"val":"/","end":""}],
     types: placeholder as Registry['home']['types'],
   },
+  'weather': {
+    methods: ["GET","HEAD"],
+    pattern: '/weather',
+    tokens: [{"old":"/weather","type":0,"val":"weather","end":""}],
+    types: placeholder as Registry['weather']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

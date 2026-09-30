@@ -813,6 +813,272 @@ input {
 }
 
 /* ==========================================================================
+   Paris weather
+   ========================================================================== */
+.weather-page {
+  min-height: 100vh;
+  padding: 128px 24px 64px;
+  background:
+    radial-gradient(
+      circle at 50% 16%,
+      color-mix(in oklab, var(--card) 80%, transparent),
+      transparent 38%
+    ),
+    var(--paper);
+}
+.weather-shell {
+  width: min(680px, 100%);
+  margin: 0 auto;
+}
+.weather-heading {
+  max-width: 560px;
+  margin-bottom: 26px;
+}
+.weather-heading__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.weather-heading h1 {
+  margin-top: 12px;
+  font-family: var(--serif);
+  font-size: clamp(34px, 7vw, 48px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.weather-heading p {
+  margin-top: 11px;
+  color: var(--muted);
+  font-size: 14.5px;
+  text-wrap: pretty;
+}
+.weather-card {
+  min-height: 230px;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  box-shadow: 0 34px 70px -54px rgba(10, 10, 11, 0.6);
+}
+:root[data-theme='dark'] .weather-card {
+  box-shadow: 0 34px 80px -52px rgba(0, 0, 0, 0.9);
+}
+.weather-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px;
+}
+.weather-current__summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.weather-current__icon {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.weather-current__condition {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.weather-current__updated {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.weather-current__temperature {
+  display: flex;
+  align-items: flex-start;
+  font-family: var(--serif);
+  font-size: 68px;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
+.weather-current__temperature sup {
+  margin: 2px 0 0 4px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.weather-range {
+  display: grid;
+  grid-template-columns: auto minmax(60px, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin: 0 34px;
+  padding: 17px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.weather-range__track {
+  height: 3px;
+  overflow: hidden;
+  background: var(--line-2);
+  border-radius: 999px;
+}
+.weather-range__track span {
+  display: block;
+  width: 62%;
+  height: 100%;
+  margin-left: 24%;
+  background: var(--ink);
+  border-radius: inherit;
+}
+.weather-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+.weather-detail {
+  min-width: 0;
+  padding: 20px 22px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.weather-detail:nth-child(3n) {
+  border-right: 0;
+}
+.weather-detail:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+.weather-detail dt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.weather-detail dd {
+  margin-top: 8px;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.weather-state {
+  min-height: 230px;
+  padding: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: var(--muted);
+  text-align: left;
+}
+.weather-state--error {
+  flex-direction: column;
+  text-align: center;
+}
+.weather-state__spinner {
+  animation: weather-spin 1.1s linear infinite;
+}
+.weather-state__title {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+.weather-state__copy {
+  margin-top: 2px;
+  font-size: 13.5px;
+}
+.weather-state--error .btn {
+  margin-top: 8px;
+}
+.weather-source {
+  margin-top: 14px;
+  color: var(--subtle);
+  font-size: 11.5px;
+  text-align: center;
+}
+.weather-source a {
+  text-decoration: underline;
+  text-decoration-color: var(--line-2);
+  text-underline-offset: 3px;
+}
+@keyframes weather-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .weather-state__spinner {
+    animation: none;
+  }
+}
+@media (max-width: 620px) {
+  .weather-page {
+    padding-top: 112px;
+  }
+  .weather-current {
+    align-items: flex-start;
+    padding: 26px;
+  }
+  .weather-current__icon {
+    width: 50px;
+    height: 50px;
+  }
+  .weather-current__temperature {
+    font-size: 52px;
+  }
+  .weather-range {
+    margin: 0 26px;
+  }
+  .weather-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .weather-detail:nth-child(3n) {
+    border-right: 1px solid var(--line);
+  }
+  .weather-detail:nth-child(2n) {
+    border-right: 0;
+  }
+  .weather-detail:nth-last-child(-n + 3) {
+    border-bottom: 1px solid var(--line);
+  }
+  .weather-detail:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+}
+@media (max-width: 440px) {
+  .header__inner {
+    padding: 0 18px;
+  }
+  .header--floating .header__right .btn--ghost {
+    padding: 0 6px;
+  }
+  .weather-current {
+    gap: 12px;
+    padding: 22px;
+  }
+  .weather-current__icon {
+    display: none;
+  }
+  .weather-range {
+    margin: 0 22px;
+  }
+  .weather-detail {
+    padding: 18px;
+  }
+}
+
+/* ==========================================================================
    Toasts (Sonner)
    ========================================================================== */
 [data-sonner-toaster] {

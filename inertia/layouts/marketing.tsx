@@ -13,6 +13,9 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
         <div className="header__inner">
           <Logo size={28} />
           <div className="header__right">
+            <Link route="weather" className="btn btn--ghost btn--sm">
+              Paris weather
+            </Link>
             <ThemeToggle />
             {props.user ? (
               <Link route="dashboard" className="btn btn--primary btn--sm">
